@@ -47,7 +47,7 @@ async function instance(t, schema, env = {}) {
       ...env,
     },
   });
-  const h = { log: '', dataDir };
+  const h = { log: '', dataDir, schema };
   child.stderr.on('data', d => { h.log += d; });
   const port = await new Promise((resolve, reject) => {
     const give = setTimeout(() => reject(new Error('no port: ' + h.log)), 15000);
@@ -173,6 +173,35 @@ test('the first profile is the owner; after it a new profile needs an invite', {
   // a fresh instance comes up closed as well
   const b = await instance(t, schema);
   assert.equal((await b.req('GET', '/api/config')).body.invite_only, true);
+});
+
+test('the phone app (and its Apple Watch) pairs with a code and then syncs with a token, from its own origin', { skip }, async t => {
+  const a = await instance(t, newSchema(t));
+  const up = await signUp(a, 'Andrii');
+  await a.req('PUT', '/api/data', { cookie: up.cookie, body: { state: profile(), baseRev: 0 } });
+  // Settings → Account → "Pair the mobile app": confirmed with the passkey, then a code on screen
+  const opt = await a.req('POST', '/api/login/options', { body: {} });
+  const made = await a.req('POST', '/api/pair/create', { cookie: up.cookie, body: { cid: opt.body.cid, credential: up.passkey.assertion(opt.body.options.challenge) } });
+  assert.equal(made.status, 200, made.text);
+  // the app is not a page of this site: its requests come from the WebView's origin, with no cookie
+  const APP = 'capacitor://localhost';
+  const pre = await a.req('OPTIONS', '/api/pair/redeem', { headers: { Origin: APP, 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type, authorization' } });
+  assert.equal(pre.status, 204);
+  assert.equal(pre.headers.get('access-control-allow-origin'), APP);
+  const paired = await a.req('POST', '/api/pair/redeem', { body: { code: made.body.code }, headers: { Origin: APP } });
+  assert.equal(paired.status, 200, paired.text);
+  assert.equal(paired.headers.get('access-control-allow-origin'), APP);
+  const bearer = { Origin: APP, Authorization: 'Bearer ' + paired.body.token };
+  const got = await a.req('GET', '/api/data', { headers: bearer });
+  assert.equal(got.status, 200, got.text);
+  assert.equal(got.body.rev, 1);
+  // a workout ticked off on the watch reaches the server through the phone, and the browser sees it
+  const put = await a.req('PUT', '/api/data', { headers: bearer, body: { state: profile({ workouts: [{ id: 'w-watch', d: '2026-11-21', name: 'Push day' }] }), baseRev: 1 } });
+  assert.equal(put.status, 200, put.text);
+  assert.equal((await a.req('GET', '/api/data', { cookie: up.cookie })).body.state.workouts[0].id, 'w-watch');
+  // and the token is still good on another copy of the function (after a redeploy)
+  const b = await instance(t, a.schema);
+  assert.equal((await b.req('GET', '/api/data/rev', { headers: bearer })).body.rev, 2);
 });
 
 test('a preview and production do not see each other\'s data', { skip }, async t => {
