@@ -68,6 +68,7 @@ repository root) can be set as Vercel environment variables and reach the API un
 |---|---|---|
 | `DATABASE_URL` | set by the database integration | The PostgreSQL connection string. Never given to the API process. |
 | `ORIGIN` | production: `https://<production domain>`; preview: the address of the request | The address the app is opened at. Passkeys are bound to it. Set it when you add a custom domain. |
+| `DEFAULT_LANG` | none (English) | openGym's own setting: the language the sign-in screen and every new profile start in. This deployment sets `ru`. Each person can still pick another in Settings → Language. |
 | `BLACKGYM_SIGNUP` | `owner` | `owner`: the first profile becomes owner and admin, after that a new profile needs an invite from the owner. `open`: anyone may sign up. `invite`: always invite only. |
 | `BLACKGYM_DB_SCHEMA` | `blackgym_<production\|preview\|development>` | Where the data lives in the database. Production and previews are separate on purpose. |
 | `BLACKGYM_SNAPSHOT_DAYS` | `30` | How many days of daily snapshots to keep. `0` turns them off. |
