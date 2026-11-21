@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 // Settings → Look & Home → App icon in a browser, for a deployment that ships icons of its own
-// (lib/brand-icons.js, BlackGym's vercel/branding/): the row is there, offers those icons under the
+// (lib/brand.js, BlackGym's vercel/branding/): the row is there, offers those icons under the
 // names their owner gave them, and the browser keeps the choice. Without such icons a browser has
 // no row, as before.
 import React, { act } from 'react'
@@ -15,7 +15,8 @@ vi.mock('../store/useUI.js', () => ({ useUI: { getState: () => ({ toast: m.toast
 
 import AppIconRow from './AppIconRow.jsx'
 import { appIconState, setAppIcon } from '../lib/app-icon.js'
-import { hasBrandIcons, brandIcons, brandIconHint } from '../lib/brand-icons.js'
+import { hasBrandIcons, brandIcons, brandIconHint, brandLockup, brandTagline, brandDefault } from '../lib/brand.js'
+import BrandLogo, { BrandMark } from './BrandLogo.jsx'
 import { setLang } from '../lib/i18n.js'
 
 // What vercel/branding/boot.js leaves on the page.
@@ -23,6 +24,8 @@ function brandOnPage() {
   let now = 'kettlebell'
   const calls = []
   window.__BLACKGYM_BRAND__ = {
+    name: 'BlackGym', wordmark: [['BLACK', null], ['GYM', '#DC141C']], defaults: { theme: 'system' },
+    tagline: { ru: 'Твои тренировки.' },
     icons: [
       { id: 'kettlebell', name: { en: 'Kettlebell', ru: 'Гиря' } },
       { id: 'logo', name: { en: 'Logo', ru: 'Логотип' } },
@@ -91,5 +94,21 @@ describe('the app icon row in a browser', () => {
   it('refuses an icon the deployment does not have', async () => {
     brandOnPage()
     await expect(setAppIcon('default')).rejects.toThrow('unknown icon')
+  })
+
+  it('shows the deployment\'s logo where openGym shows its own', async () => {
+    host = document.createElement('div'); document.body.appendChild(host); root = createRoot(host)
+    await act(async () => { root.render(<><BrandLogo size={36} /><BrandMark height={28} /></>) })
+    expect(host.querySelector('.brand-lockup').textContent).toBe('openGym')
+    expect(host.querySelector('img')).toBe(null)
+    brandOnPage()
+    expect(brandLockup()).toEqual({ name: 'BlackGym', parts: [['BLACK', null], ['GYM', '#DC141C']], src: 'brand/kettlebell-180.png' })
+    await act(async () => { root.render(<><BrandLogo size={40} /><BrandMark height={28} /></>) })
+    const lockup = host.querySelector('.brand-lockup')
+    expect(lockup.getAttribute('aria-label')).toBe('BlackGym')
+    expect(lockup.textContent).toBe('BLACKGYM')
+    expect([...host.querySelectorAll('img')].map(i => i.getAttribute('src'))).toEqual(['brand/kettlebell-180.png', 'brand/kettlebell-180.png'])
+    expect(brandTagline('ru')).toBe('Твои тренировки.')
+    expect(brandTagline('de')).toBe('Твои тренировки.')
   })
 })

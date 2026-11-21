@@ -1,13 +1,16 @@
-// A deployment's own home-screen icons, in a browser (BlackGym: vercel/branding/).
+// A deployment's own name, logo and home-screen icons, in a browser (BlackGym: vercel/branding/).
 //
 // openGym's web app has no icon to change, and lib/app-icon.js says so. A deployment that ships
 // icons of its own loads a small script before the app (vercel/branding/boot.js), which keeps the
 // choice in this browser, points the page's icon links at it and leaves this object behind:
 //
-//   window.__BLACKGYM_BRAND__ = { icons: [{ id, name: { en, ru, … } }], hint: { en, … } | null,
+//   window.__BLACKGYM_BRAND__ = { name, wordmark: [[text, colour | null], …] | null,
+//                                 tagline: { en, … } | null, defaults: { theme } | null,
+//                                 icons: [{ id, name: { en, ru, … } }], hint: { en, … } | null,
 //                                 current(): id, set(id): id }
 //
-// Without that script there is nothing here and every caller behaves as it always has.
+// Without that script there is nothing here and every caller behaves as it always has: openGym's
+// own logo, its own line under it, its own defaults.
 const brand = () => {
   try {
     const b = typeof window !== 'undefined' ? window.__BLACKGYM_BRAND__ : null
@@ -49,4 +52,25 @@ export function setBrandIcon(id) {
   const b = brand()
   if (!b || !b.icons.some(i => i.id === id)) throw new Error('unknown icon')
   return b.set(id)
+}
+
+/** The deployment's logo where openGym shows its own: { name, parts: [[text, colour | null]], src }, or null. */
+export function brandLockup() {
+  const b = brand()
+  if (!b || typeof b.name !== 'string' || !b.name) return null
+  const parts = Array.isArray(b.wordmark) ? b.wordmark.filter(p => Array.isArray(p) && typeof p[0] === 'string' && p[0])
+    .map(p => [p[0], typeof p[1] === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(p[1]) ? p[1] : null]) : []
+  const id = brandIconNow()
+  return { name: b.name, parts: parts.length ? parts : [[b.name, null]], src: id && /^[a-z0-9-]{1,32}$/.test(id) ? `brand/${id}-180.png` : null }
+}
+
+/** The line under the logo on the sign-in screen, or '' to keep openGym's. */
+export const brandTagline = lang => said(brand()?.tagline, lang)
+
+/** What a profile started on this device begins with, where the deployment says: 'theme' only. */
+export function brandDefault(key) {
+  const d = brand()?.defaults
+  if (!d || typeof d !== 'object') return null
+  if (key === 'theme') return ['dark', 'light', 'system'].includes(d.theme) ? d.theme : null
+  return null
 }

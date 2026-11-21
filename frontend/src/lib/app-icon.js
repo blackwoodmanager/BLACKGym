@@ -2,11 +2,11 @@
 // the choice: iOS its alternate icon, Android which launcher alias is on (AppIconPlugin.swift /
 // AppIconPlugin.java). Nothing goes into the synced state, so two phones can wear different icons.
 // A browser has no icon to change: there this answers null and the row stays away, unless the
-// deployment ships icons of its own (lib/brand-icons.js), which the same row then offers.
+// deployment ships icons of its own (lib/brand.js), which the same row then offers.
 import { MOBILE } from './mobile.js'
 import { platformNow } from './platform-now.js'
 import { APP_ICON_IDS } from './app-icon-variants.js'
-import { brandIcons, brandIconNow, setBrandIcon } from './brand-icons.js'
+import { brandIcons, brandIconNow, setBrandIcon } from './brand.js'
 
 // Kept inside an object: a Capacitor plugin proxy answers `then` with a native call that never
 // settles, so a promise resolved with the bare proxy would hang (the Coach hang, #42).
@@ -19,7 +19,7 @@ const iconPlugin = () => pluginP || (pluginP = (async () => {
 
 /** { name } of the icon on the home screen now (or the one about to be), or null without the option. */
 export async function appIconState() {
-  // A deployment's own icons, in a browser (lib/brand-icons.js): `icons` is then the list to offer.
+  // A deployment's own icons, in a browser (lib/brand.js): `icons` is then the list to offer.
   if (!MOBILE) {
     const icons = brandIcons()
     return icons ? { name: brandIconNow() || icons[0].id, icons: true } : null

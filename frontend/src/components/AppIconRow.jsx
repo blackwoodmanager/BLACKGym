@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { t, getLang, useLang } from '../lib/i18n.js'
 import { appIconState, setAppIcon } from '../lib/app-icon.js'
 import { APP_ICON_VARIANTS, offeredIcons } from '../lib/app-icon-variants.js'
-import { brandIcons, brandIconHint } from '../lib/brand-icons.js'
+import { brandIcons, brandIconHint } from '../lib/brand.js'
 import { seasonNow } from '../lib/season-clock.js'
 import { useUI } from '../store/useUI.js'
 import Icon from './Icon.jsx'
@@ -10,7 +10,7 @@ import Icon from './Icon.jsx'
 /* Settings → Look & Home → App icon: the icon on this phone's home screen. The phone keeps the
    choice (lib/app-icon.js), so it is asked here and never synced. In a browser, or on a phone that
    cannot switch icons, the row is not there at all, unless the deployment ships icons of its own
-   (lib/brand-icons.js): then the row offers those, and the browser keeps the choice. */
+   (lib/brand.js): then the row offers those, and the browser keeps the choice. */
 export default function AppIconRow() {
   const [state, setState] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -34,7 +34,7 @@ export default function AppIconRow() {
       useUI.getState().toast(t('The icon could not be changed.'))
     } finally { setBusy(false) }
   }
-  // The deployment's own icons in a browser (lib/brand-icons.js), else the phone app's.
+  // The deployment's own icons in a browser (lib/brand.js), else the phone app's.
   const own = state.icons ? brandIcons(lang) : null
   const list = own || offeredIcons(seasonNow(), state.name).map(v => ({ id: v.id, name: t(v.name), src: `app-icons/${v.id}.png` }))
   const current = own ? own.find(v => v.id === state.name) || own[0]

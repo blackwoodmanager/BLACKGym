@@ -74,7 +74,7 @@ import { durationSheet } from '../components/DurationWheel.jsx'
 import { showsConnection, showsLocalLine } from '../components/SyncBanner.jsx'
 import BackupFolderRow, { useBackupFolder, autoBackupSubtitle } from '../components/BackupFolderRow.jsx'
 import AppIconRow from '../components/AppIconRow.jsx'
-import { hasBrandIcons } from '../lib/brand-icons.js'
+import { hasBrandIcons } from '../lib/brand.js'
 import { AnimationQualityRow } from '../components/Animations.jsx'
 import { ServerSyncSection, KeptChangesRows, leaveServer, connectServer, passkeySignIn } from '../components/ServerSync.jsx'
 import { passwordOn, PasswordRow, openPasswordSignIn, openPasswordRegister } from '../components/PasswordAuth.jsx'
@@ -1116,7 +1116,7 @@ export default function Settings({ page = null, find = null, via = null, entryKe
         {/* Motion and text size (lib/display-prefs.js): this device only, like the app icon. */}
         <DisplayRows />
         {/* The home-screen icon: the phone's own, not synced; in the phone app, and in a browser
-            when the deployment ships icons of its own (lib/brand-icons.js). */}
+            when the deployment ships icons of its own (lib/brand.js). */}
         {((MOBILE && platformNow()) || hasBrandIcons()) && <AppIconRow />}
         {/* How the muscle map is drawn. The exercise drawings follow it until they are set below. */}
         <Row icon="figureStrength" iconTint="var(--teal)" title={t('Body diagram')}>

@@ -7,6 +7,7 @@ import { registerCustom, healCustomEx } from '../lib/exercises.js'
 import { syncGymInventory } from '../lib/gym-inventory.js'
 import { DEMO, DEMO_SEEDED } from '../lib/demo.js'
 import { rememberDefaultLang } from '../lib/default-lang.js'
+import { brandDefault } from '../lib/brand.js'
 import { guestAllowed } from '../lib/guest.js'
 import { stateJson } from '../lib/state-json.js'
 import { MOBILE, initReminderSync, nativeLoad, nativeSave, onAppActive, readJsonFile, syncReminder, writeAutoBackup, writeJsonFile } from '../lib/mobile.js'
@@ -354,6 +355,9 @@ export function freshState() {
   s.streakRuleAsk = true
   // The brand's green (1.4.5). DEF stays on the old green, so only a copy made here gets this.
   s.accent = NEW_ACCENT
+  // A deployment may start new profiles in another theme than openGym's dark (lib/brand.js).
+  const theme = brandDefault('theme')
+  if (theme) s.theme = theme
   return s
 }
 

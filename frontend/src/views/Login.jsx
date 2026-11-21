@@ -2,11 +2,12 @@ import { useStore } from '../store/useStore.js'
 import { useUI } from '../store/useUI.js'
 import { webauthnOK, passkeyLogin, passkeyRegister, passkeyError, bio } from '../lib/api.js'
 import { hasData } from '../store/useStore.js'
-import { t } from '../lib/i18n.js'
+import { t, getLang } from '../lib/i18n.js'
 import { DEMO, REPO } from '../lib/demo.js'
 import { guestAllowed } from '../lib/guest.js'
 import { useState, useRef, useEffect } from 'react'
 import BrandLogo from '../components/BrandLogo.jsx'
+import { brandTagline } from '../lib/brand.js'
 import { Button, Segmented } from '../components/ui.jsx'
 import { askAddDeviceData } from '../sheets.jsx'
 import { passwordOn, PasswordRegisterForm, openPasswordSignIn } from '../components/PasswordAuth.jsx'
@@ -121,7 +122,7 @@ export default function Login() {
   if (ssoOnly) return (
     <div className="narrow" style={wrap}>
       {head}
-      <div className="muted" style={{ marginBottom: 34 }}>{t('Your workouts. Your weights. Your profile.')}</div>
+      <div className="muted" style={{ marginBottom: 34 }}>{brandTagline(getLang()) || t('Your workouts. Your weights. Your profile.')}</div>
       {ssoNote}
       {ssoButton}
       {canGuest && <Button variant="ghost" className="dim" onClick={() => setGuest(true)}>{t('Continue without account')}</Button>}
@@ -136,7 +137,7 @@ export default function Login() {
   return (
     <div className="narrow" style={wrap}>
       {head}
-      <div className="muted" style={{ marginBottom: 34 }}>{t('Your workouts. Your weights. Your profile.')}</div>
+      <div className="muted" style={{ marginBottom: 34 }}>{brandTagline(getLang()) || t('Your workouts. Your weights. Your profile.')}</div>
       {ssoNote}
       {ssoButton}
       {webauthnOK() ? <>

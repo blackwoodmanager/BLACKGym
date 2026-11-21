@@ -4,8 +4,9 @@
  * the null below, and loads it from index.html right after the loading screen's markup. It
  *   - points the home-screen icon, the tab icon and the web manifest at the icon chosen here,
  *   - shows that icon on the loading screen,
- *   - and hands the list to the app (window.__BLACKGYM_BRAND__), which offers the choice in
- *     Settings, Look & Home, App icon (frontend/src/lib/brand-icons.js).
+ *   - and hands the name, the logo's wordmark, the defaults and the list of icons to the app
+ *     (window.__BLACKGYM_BRAND__, read by frontend/src/lib/brand.js): the sign-in screen shows
+ *     the logo, and Settings, Look & Home, App icon offers the choice.
  * The choice is kept in this browser only, like the phone app's icon: two devices can differ.
  * Plain old syntax, no modules: it runs before the app and must run where the app would not.
  */
@@ -33,6 +34,10 @@
     if (img && img.getAttribute('src') !== src) img.setAttribute('src', src);
   }
   window.__BLACKGYM_BRAND__ = {
+    name: BRAND.name,
+    wordmark: BRAND.wordmark || null,
+    tagline: BRAND.tagline || null,
+    defaults: BRAND.defaults || null,
     icons: BRAND.icons,
     hint: BRAND.hint || null,
     current: current,

@@ -5,7 +5,7 @@ folder over it: the name on the Home Screen, the icon, and the picture on the lo
 
 | File | What it is |
 |---|---|
-| `brand.json` | The name, the icons, which one is the default, and the texts shown in Settings. |
+| `brand.json` | The name and its wordmark (`wordmark`: the parts and their colours), the theme a new profile starts in (`defaults.theme`: `system`, `dark` or `light`), an optional line under the logo on the sign-in screen (`tagline`, per language), the icons, which one is the default, and the texts shown in Settings. |
 | `BLACKGym_icon_*.png` | The drawings, 1024 × 1024. |
 | `web/<id>-180.png`, `-320.png`, `-512.png` | The drawings as the site serves them, made by `scripts/make-icons.py`. Committed, so the build needs no image library. |
 | `boot.js` | Runs before the app: applies the icon chosen on this device. |

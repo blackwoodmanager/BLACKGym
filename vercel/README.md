@@ -9,8 +9,12 @@ What differs from openGym outside this folder:
 
 | File | Change |
 |---|---|
-| `frontend/src/lib/brand-icons.js` (new) | Reads the deployment's own icons, when the page has any. |
-| `frontend/src/lib/app-icon.js`, `components/AppIconRow.jsx`, `views/Settings.jsx` | Settings → Look & Home → App icon is offered in a browser too when the deployment ships icons of its own. Without them (openGym itself) nothing changes. |
+| `frontend/src/lib/brand.js` (new) | Reads the deployment's own name, logo, icons and defaults, when the page has any. |
+| `frontend/src/lib/app-icon.js`, `components/AppIconRow.jsx`, `views/Settings.jsx` | Settings → Look & Home → App icon is offered in a browser too when the deployment ships icons of its own. |
+| `frontend/src/components/BrandLogo.jsx`, `views/Login.jsx` | The sign-in screen shows the deployment's logo, and its own line under it when `brand.json` has a `tagline`. |
+| `frontend/src/store/useStore.js` | A new profile starts in the theme `brand.json` asks for (`defaults.theme`). |
+
+Without a deployment brand (openGym itself) none of these changes anything.
 
 ## How it works
 

@@ -55,7 +55,10 @@ export function applyBrand({ brandDir, staticDir, log = console.log }) {
   }
 
   // the script, with the list in it. No file names of the drawings: the site has no use for them.
-  const config = { default: brand.default, icons: brand.icons.map(({ id, name }) => ({ id, name })), hint: brand.hint || null };
+  const config = {
+    name: brand.name, wordmark: brand.wordmark || null, tagline: brand.tagline || null, defaults: brand.defaults || null,
+    default: brand.default, icons: brand.icons.map(({ id, name }) => ({ id, name })), hint: brand.hint || null,
+  };
   const boot = fs.readFileSync(path.join(brandDir, 'boot.js'), 'utf8');
   if (!boot.includes('/*BRAND*/null/*END*/')) throw new Error('branding/boot.js lost its /*BRAND*/null/*END*/ marker');
   fs.writeFileSync(path.join(out, 'boot.js'), boot.replace('/*BRAND*/null/*END*/', JSON.stringify(config)));
