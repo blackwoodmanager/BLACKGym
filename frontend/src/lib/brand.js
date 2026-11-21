@@ -5,7 +5,7 @@
 // choice in this browser, points the page's icon links at it and leaves this object behind:
 //
 //   window.__BLACKGYM_BRAND__ = { name, wordmark: [[text, colour | null], …] | null,
-//                                 tagline: { en, … } | null, defaults: { theme } | null,
+//                                 tagline: { en, … } | null, defaults: { theme, accent } | null,
 //                                 icons: [{ id, name: { en, ru, … } }], hint: { en, … } | null,
 //                                 current(): id, set(id): id }
 //
@@ -67,10 +67,14 @@ export function brandLockup() {
 /** The line under the logo on the sign-in screen, or '' to keep openGym's. */
 export const brandTagline = lang => said(brand()?.tagline, lang)
 
-/** What a profile started on this device begins with, where the deployment says: 'theme' only. */
+/**
+ * What a profile started on this device begins with, where the deployment says: 'theme' (one the
+ * app has) and 'accent' (a colour of the deployment's own, '#rrggbb'). Anything else is null.
+ */
 export function brandDefault(key) {
   const d = brand()?.defaults
   if (!d || typeof d !== 'object') return null
   if (key === 'theme') return ['dark', 'light', 'system'].includes(d.theme) ? d.theme : null
+  if (key === 'accent') return typeof d.accent === 'string' && /^#[0-9a-f]{6}$/i.test(d.accent) ? d.accent.toLowerCase() : null
   return null
 }

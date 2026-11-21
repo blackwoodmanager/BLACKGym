@@ -10,8 +10,12 @@
       "#DC141C"
     ]
   ],
+  "tagline": {
+    "ru": "Добро пожаловать в зал!"
+  },
   "defaults": {
-    "theme": "system"
+    "theme": "system",
+    "accent": "#DC141C"
   },
   "default": "kettlebell",
   "icons": [

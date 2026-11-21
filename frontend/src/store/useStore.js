@@ -32,7 +32,7 @@ import { RTL_LANGS } from '../lib/i18n-core.js'
 import { DEFAULT_TEMPLATE_ID } from '../lib/structuralBalanceTemplates.js'
 
 import { WC_DEFAULT } from '../lib/workout-controls.js'
-import { sanitizeAccent, NEW_ACCENT } from '../lib/accent.js'
+import { sanitizeAccent, NEW_ACCENT, CUSTOM } from '../lib/accent.js'
 import { registerExerciseAliases } from '../lib/exercise-aliases.js'
 
 const KEY = 'gym_state_v1'
@@ -358,6 +358,9 @@ export function freshState() {
   // A deployment may start new profiles in another theme than openGym's dark (lib/brand.js).
   const theme = brandDefault('theme')
   if (theme) s.theme = theme
+  // And in a colour of its own: the user's-own-colour accent (lib/accent.js), set to that colour.
+  const accent = brandDefault('accent')
+  if (accent) { s.accent = CUSTOM; s.accentCustom = accent }
   return s
 }
 
