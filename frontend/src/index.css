@@ -2973,6 +2973,26 @@ body.no-tabbar.resting #toast{bottom:calc(100px + var(--sab))}
 #totop:focus-visible{outline:2px solid var(--acc-ink);outline-offset:2px}
 #totop .icn{font-size:1.3125rem;--icon-stroke:2.1}
 body.resting #totop{bottom:calc(172px + var(--sab))}
+/* BlackGym's bug button (components/FeedbackBug.jsx): a small tab stuck to the end edge of the
+   screen, rounded only on the side that faces the page and dimmed until it is touched, so it is
+   there when wanted and not in the way. Under the sheets (z-index) and away from the tab bar. */
+#fbbug{
+  position:fixed;inset-inline-end:0;top:38%;z-index:44;
+  width:30px;height:38px;display:grid;place-items:center;padding:0;
+  border-start-start-radius:12px;border-end-start-radius:12px;
+  background:var(--surface-raised);color:var(--acc-ink);
+  border:var(--hair) solid var(--raised-line);border-inline-end:0;
+  box-shadow:0 6px 16px -8px rgba(0,0,0,.5);opacity:.5;
+  transition:opacity var(--fast),transform var(--fast);
+}
+#fbbug:hover,#fbbug:focus-visible{opacity:1}
+#fbbug:active{opacity:1;transform:scale(var(--press-scale-sm))}
+#fbbug:focus-visible{outline:2px solid var(--acc-ink);outline-offset:2px}
+#fbbug .icn{font-size:1.125rem;--icon-stroke:2}
+:root[data-theme="light"] #fbbug{background:var(--surface)}
+.fb-done{margin:0 0 10px}
+.fb-err{margin:10px 0 0;color:var(--red)}
+.fb-link{color:var(--acc-ink);text-decoration:underline}
 /* While it shows, the page ends a button's height further up, so the last row's controls scroll
    out from under it rather than sitting beneath it. */
 body.totop-on #app{padding-bottom:calc(144px + var(--sab))}

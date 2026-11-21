@@ -328,7 +328,7 @@ main.api-main .lead { color: var(--fg-2); max-width: 58ch; margin: 14px 0 0; fon
   <p class="api-facts">
     <span>OpenAPI 3.1.0</span>
     <span>openGym v1.4.5</span>
-    <span>177 endpoints</span>
+    <span>178 endpoints</span>
     <span>AGPL-3.0-or-later</span>
   </p>
 
@@ -6342,6 +6342,82 @@ main.api-main .lead { color: var(--fg-2); max-width: 58ch; margin: 14px 0 0; fon
   </div>
 </details>
 
+<details class="ep" id="op-postFeedback">
+  <summary>
+    <span class="m post">POST</span>
+    <span class="ep-path"><code>/api/feedback</code><span class="ep-chip admin">admin</span></span>
+    <span class="ep-chev" aria-hidden="true"></span>
+    <span class="ep-sum">Send a bug or an idea to the orchestrator</span>
+  </summary>
+  <div class="ep-body">
+<p>BlackGym's bug button. The server hands the request to the orchestrator (<code>ORCH_FEEDBACK_URL</code>, key in <code>ORCH_FEEDBACK_TOKEN</code>), which queues it as a task. The key never leaves the server. Admin only. Answers 503 with <code>code: feedback-off</code> while the two variables are not both set; <code>/api/me</code> carries <code>user.feedback: true</code> only when the route works for the caller, which is what the app hangs its button on. The audit log records that a request was sent and its kind, never its text.</p>
+    <p class="ep-auth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Admin only: a signed-in session whose user is an admin (<code>ADMIN_UIDS</code> or <code>admin:true</code>), as the session cookie or a Bearer token.</span></p>
+
+<p class="ep-h">Request body <span class="p-hint">(JSON)</span></p><div class="ptab">
+  <div class="prow">
+    <span class="p-name">kind</span>
+    <span class="p-type">&quot;bug&quot; | &quot;idea&quot;</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">text<em class="p-req" title="required">required</em></span>
+    <span class="p-type">string <span class="p-hint">(&le; 4000 chars)</span></span>
+    <span class="p-desc">What went wrong, or what to change.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">requestId</span>
+    <span class="p-type">string</span>
+    <span class="p-desc">Makes a retry harmless; the orchestrator queues one task per id.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">context</span>
+    <span class="p-type">object</span>
+    <span class="p-desc">Where it happened. Only <code>route</code>, <code>version</code>, <code>platform</code>, <code>lang</code>, <code>theme</code>, <code>screen</code> and <code>userAgent</code> are kept, each one short line.</span>
+  </div>
+</div>
+<pre><code>{
+  &quot;kind&quot;: &quot;bug&quot;,
+  &quot;text&quot;: &quot;The Start button does nothing on the Plan screen.&quot;,
+  &quot;requestId&quot;: &quot;5b1f0c1e-3c1a-4d0e-9e1b-0a3f2d6c7e11&quot;,
+  &quot;context&quot;: {
+    &quot;route&quot;: &quot;/plan&quot;,
+    &quot;platform&quot;: &quot;web&quot;
+  }
+}</code></pre>
+    <p class="ep-h">Responses</p>
+    <div class="ptab">
+  <div class="prow rrow">
+    <span class="r-code s2">200</span>
+    <span class="p-desc">Queued by the orchestrator.<span class="r-sig">{ ok: boolean, id: string, link: string, duplicate: boolean }</span></span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">400</span>
+    <span class="p-desc">Empty or over-long text, unknown kind, malformed requestId.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">401</span>
+    <span class="p-desc">No session, expired/revoked session, or a disabled account.<span class="r-sig"><code>{&quot;error&quot;:&quot;not signed in&quot;}</code></span></span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">403</span>
+    <span class="p-desc">Not an admin.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">429</span>
+    <span class="p-desc">The orchestrator's hourly limit for this app.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s5">502</span>
+    <span class="p-desc">The orchestrator did not answer or refused (<code>code</code>: orchestrator-down, orchestrator-refused).</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s5">503</span>
+    <span class="p-desc">Not set up on this server (<code>code</code>: feedback-off).</span>
+  </div>
+    </div>
+  </div>
+</details>
+
 <details class="ep" id="op-adminUsers">
   <summary>
     <span class="m get">GET</span>
@@ -8108,6 +8184,11 @@ main.api-main .lead { color: var(--fg-2); max-width: 58ch; margin: 14px 0 0; fon
     <span class="p-name">oidc</span>
     <span class="p-type">boolean</span>
     <span class="p-desc">Present (true) when the profile is linked to the configured identity provider.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">feedback</span>
+    <span class="p-type">boolean</span>
+    <span class="p-desc">Present (true) for an admin on a server where the bug button works (<code>ORCH_FEEDBACK_URL</code> and <code>ORCH_FEEDBACK_TOKEN</code> are set); see POST /api/feedback.</span>
   </div>
 </div>
   </div>

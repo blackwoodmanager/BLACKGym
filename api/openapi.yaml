@@ -3572,6 +3572,63 @@ paths:
               schema: { $ref: '#/components/schemas/Ok' }
         '401': { $ref: '#/components/responses/Unauthorized' }
 
+  /api/feedback:
+    post:
+      tags: [admin]
+      operationId: postFeedback
+      summary: 'Admin: send a bug or an idea to the orchestrator'
+      description: |
+        BlackGym's bug button. The server hands the request to the orchestrator
+        (`ORCH_FEEDBACK_URL`, key in `ORCH_FEEDBACK_TOKEN`), which queues it as a task. The key
+        never leaves the server. Admin only. Answers 503 with `code: feedback-off` while the two
+        variables are not both set; `/api/me` carries `user.feedback: true` only when the route
+        works for the caller, which is what the app hangs its button on. The audit log records
+        that a request was sent and its kind, never its text.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                kind: { type: string, enum: [bug, idea], default: bug }
+                text:
+                  type: string
+                  maxLength: 4000
+                  description: What went wrong, or what to change.
+                requestId:
+                  type: string
+                  pattern: '^[A-Za-z0-9_-]{8,64}$'
+                  description: Makes a retry harmless; the orchestrator queues one task per id.
+                context:
+                  type: object
+                  description: Where it happened. Only `route`, `version`, `platform`, `lang`, `theme`, `screen` and `userAgent` are kept, each one short line.
+                  additionalProperties: { type: string }
+            example:
+              kind: bug
+              text: The Start button does nothing on the Plan screen.
+              requestId: 5b1f0c1e-3c1a-4d0e-9e1b-0a3f2d6c7e11
+              context: { route: /plan, platform: web }
+      responses:
+        '200':
+          description: Queued by the orchestrator.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  id: { type: string, description: The orchestrator's task id. }
+                  link: { type: string, nullable: true, description: Where to follow it (https). }
+                  duplicate: { type: boolean, description: True when this `requestId` was already queued. }
+        '400': { description: 'Empty or over-long text, unknown kind, malformed requestId.', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Not an admin., content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '429': { description: The orchestrator's hourly limit for this app., content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '502': { description: 'The orchestrator did not answer or refused (`code`: orchestrator-down, orchestrator-refused).', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '503': { description: 'Not set up on this server (`code`: feedback-off).', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
   /api/admin/users:
     get:
       tags: [admin]
@@ -6368,6 +6425,7 @@ components:
         owner: { type: boolean, description: Present (true) only for the instance owner. }
         admin: { type: boolean }
         oidc: { type: boolean, description: Present (true) when the profile is linked to the configured identity provider. }
+        feedback: { type: boolean, description: "Present (true) for an admin on a server where the bug button works (`ORCH_FEEDBACK_URL` and `ORCH_FEEDBACK_TOKEN` are set); see POST /api/feedback." }
       example: { id: "Zk3q9XyPbA2LmN0v", name: "Ada", admin: false }
 
     # ------------------------------------------------------------------ WebAuthn
