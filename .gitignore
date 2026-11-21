@@ -56,3 +56,7 @@ frontend/ios/App/WatchCore/.build/
 /dist/
 .wrangler/
 .taste-skill/
+
+# BlackGym on Vercel (vercel/README.md): the build output, and data copied out of the database
+.vercel/
+backups/

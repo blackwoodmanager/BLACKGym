@@ -1,0 +1,21 @@
+{
+  "name": "blackgym-vercel",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "description": "Runs the unmodified openGym API on Vercel: a function that starts api/server.js and keeps its data directory in PostgreSQL.",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node dev-server.mjs",
+    "test": "node --test --test-concurrency=1 test/*.test.mjs",
+    "backup": "node scripts/backup.mjs",
+    "restore": "node scripts/restore.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  }
+}
