@@ -15,6 +15,7 @@ import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { applyBrand } from './brand.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(HERE, '..');
@@ -49,6 +50,9 @@ step('static: exercise media');
 const media = path.join(ROOT, 'catalogue', 'media');
 fs.cpSync(media, path.join(STATIC, 'exercise-media'), { recursive: true });
 const count = dir => fs.readdirSync(dir, { withFileTypes: true }).reduce((n, e) => n + (e.isDirectory() ? count(path.join(dir, e.name)) : 1), 0);
+
+step('static: BlackGym name and icons');
+applyBrand({ brandDir: path.join(HERE, 'branding'), staticDir: STATIC });
 console.log(`${count(STATIC)} static files`);
 
 /* ---------- the function ---------- */

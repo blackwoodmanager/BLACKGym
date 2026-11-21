@@ -1,0 +1,15 @@
+{
+  "name": "BlackGym",
+  "default": "kettlebell",
+  "icons": [
+    { "id": "kettlebell", "file": "BLACKGym_icon_5.png", "name": { "en": "Kettlebell", "ru": "Гиря", "uk": "Гиря" } },
+    { "id": "logo", "file": "BLACKGym_icon_1.png", "name": { "en": "Logo", "ru": "Логотип", "uk": "Логотип" } },
+    { "id": "dumbbell", "file": "BLACKGym_icon_2.png", "name": { "en": "Dumbbell", "ru": "Гантель", "uk": "Гантель" } },
+    { "id": "back", "file": "BLACKGym_icon_3.png", "name": { "en": "Athlete", "ru": "Атлет", "uk": "Атлет" } }
+  ],
+  "hint": {
+    "en": "Also shown while the app loads. An icon already on the Home Screen keeps its picture: remove it and add the app again to change it.",
+    "ru": "Она же показывается при загрузке. Иконка, уже добавленная на экран «Домой», не меняется: удалите её и добавьте приложение заново.",
+    "uk": "Вона ж показується під час завантаження. Іконка, вже додана на екран «Домівка», не змінюється: видаліть її та додайте застосунок знову."
+  }
+}

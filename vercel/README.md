@@ -1,8 +1,16 @@
 # BlackGym on Vercel
 
 BlackGym is a personal, non-commercial deployment of [openGym](https://github.com/DuarteSantos8/openGym)
-(AGPL-3.0-or-later). This folder is everything that was added to run it on Vercel. Nothing under
-`frontend/`, `api/` or `catalogue/` is changed, so openGym's own updates merge without conflicts.
+(AGPL-3.0-or-later). This folder is everything that was added to run it on Vercel. `api/` and
+`catalogue/` are unchanged, and `frontend/` differs from openGym in one small place, listed below,
+so openGym's own updates merge with little or no conflict.
+
+What differs from openGym outside this folder:
+
+| File | Change |
+|---|---|
+| `frontend/src/lib/brand-icons.js` (new) | Reads the deployment's own icons, when the page has any. |
+| `frontend/src/lib/app-icon.js`, `components/AppIconRow.jsx`, `views/Settings.jsx` | Settings → Look & Home → App icon is offered in a browser too when the deployment ships icons of its own. Without them (openGym itself) nothing changes. |
 
 ## How it works
 
@@ -36,6 +44,7 @@ merges. The lock in step 1 is what keeps that check correct with several copies 
 | File | What it is |
 |---|---|
 | `build.mjs` | Builds `.vercel/output` (Vercel's Build Output format): static files, the function, the routes. The routes are what `web/nginx.conf.template` does, in Vercel's terms. |
+| `brand.mjs`, `branding/` | BlackGym's name and icons, laid over the built site ([branding/README.md](branding/README.md)). |
 | `function/index.mjs` | The function behind `/api`. |
 | `function/store.mjs` | The data folder in PostgreSQL: pull, push, daily snapshots. |
 | `function/child.mjs` | Starts and restarts `api/server.js`. |
