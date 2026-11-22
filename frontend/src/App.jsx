@@ -59,6 +59,9 @@ import ScrollTopButton from './components/ScrollTopButton.jsx'
 import FeedbackBug from './components/FeedbackBug.jsx'
 import FeedbackMarkupLayer from './components/FeedbackMarkup.jsx'
 import { canGiveFeedback } from './lib/feedback.js'
+// BlackGym on a computer (desktop/): a sidebar in place of the tab bar, and a few wide screens.
+import './desktop/desktop.css'
+import { useDesktop } from './desktop/use-desktop.js'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import Modals from './components/Modals.jsx'
 import Toast from './components/Toast.jsx'
@@ -122,6 +125,10 @@ const Muscles = lazyView(() => import('./views/Muscles.jsx'))
 // The community library of the server (views/Community.jsx): only with LIBRARY=on and the module on.
 const Community = lazyView(() => import('./views/Community.jsx'))
 const SettingsRoute = lazyView(() => import('./views/Settings.jsx').then(m => ({ default: m.SettingsRoute })))
+// BlackGym's desktop layer (desktop/): the sidebar and its own screens.
+const DesktopNav = lazyView(() => import('./desktop/DesktopNav.jsx'))
+const DeskHome = lazyView(() => import('./desktop/DeskHome.jsx'))
+const Records = lazyView(() => import('./desktop/Records.jsx'))
 // The app tour's overlay (components/Tour.jsx): fetched when it opens, never before.
 const loadTour = () => import('./components/Tour.jsx')
 const Tour = lazy(loadTour)
@@ -375,6 +382,13 @@ function Shell() {
   const noTabs = inWorkout || loc.pathname === '/coach' || needsMobileOnboarding || permSteps
 
   const authed = user || isGuest
+  // BlackGym on a computer: a wide window with a mouse gets the sidebar and the wide Overview
+  // (desktop/use-desktop.js). The tab bar is still rendered and hidden by body.desk (desktop.css).
+  const desk = useDesktop() && !!authed && !needsMobileOnboarding && !permSteps
+  useEffect(() => {
+    document.body.classList.toggle('desk', desk)
+    return () => document.body.classList.remove('desk')
+  }, [desk])
   // The first setup is through (sign-in or "Use on this device", and the phone's permission
   // steps): "Want a 1-minute tour?" once, on a profile with nothing logged yet, or "Finish the
   // tour?" once after one was closed halfway (lib/tour.js). In the first idle moment after the
@@ -401,7 +415,9 @@ function Shell() {
 
   const view = l => (!authed ? <Login /> : needsMobileOnboarding ? <MobileOnboarding /> : permSteps ? <PermissionSteps /> : (
     <Routes location={l}>
-      <Route path="/home" element={<Home />} />
+      <Route path="/home" element={desk ? <DeskHome /> : <Home />} />
+      {/* BlackGym: the records of the base lifts (desktop/Records.jsx). */}
+      <Route path="/records" element={<Records />} />
       {/* A module switched off (Settings → Modules, lib/modules.js) takes its screens with it: the
           route falls through to the catch-all redirect below. The data stays where it is. */}
       {isOn(S, 'checkin') && <Route path="/checkin" element={<CheckIn />} />}
@@ -461,6 +477,7 @@ function Shell() {
           including on the sign-in screen, when the server has just ended the session. */}
       <SyncBanner />
       {!noTabs && <TabBar onStart={startOrPreview} onPick={startPickerSheet} />}
+      {desk && <DesktopNav onStart={startOrPreview} onPick={startPickerSheet} />}
       {!noTabs && authed && <ScrollTopButton off={loc.pathname === '/workout'} path={loc.pathname} />}
       {/* BlackGym's bug button: a tab on the screen's edge for the one admin the server wires it to. */}
       {!noTabs && canGiveFeedback(user) && <FeedbackBug path={loc.pathname} />}

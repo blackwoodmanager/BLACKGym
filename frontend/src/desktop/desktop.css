@@ -1,0 +1,153 @@
+/* BlackGym on a computer (desktop/): the sidebar and the wide screens. Every rule here is under
+   body.desk, which App.jsx sets only in a wide window with a mouse (desktop/use-desktop.js), or
+   on a dk- class those screens alone use. A phone never matches any of it. The colours, radii
+   and type sizes are openGym's own tokens (index.css), so themes and accents carry over. */
+
+body.desk{--desk-side:252px}
+body.desk.desk-mini{--desk-side:72px}
+
+/* ------------------------------------------------------------------ shell -- */
+/* The page sits beside the sidebar and takes the window's width. A screen of openGym's own keeps
+   the column it was drawn for, centred in what is left; a dk-page uses the room. */
+body.desk #app{max-width:none;margin:0;margin-inline-start:var(--desk-side);padding-inline:32px;padding-top:calc(var(--conn) + 28px)}
+body.desk #app > .page{max-width:1080px;margin:0 auto}
+body.desk #app > .page:has(.dk-page){max-width:1560px}
+/* The tab bar's place is taken by the sidebar. */
+body.desk #tabbar{display:none}
+/* What floats over the page centres on the page, not on the window. */
+body.desk #timer,body.desk.no-tabbar #timer{left:calc(50% + var(--desk-side) / 2)}
+body.desk #totop,body.desk.resting #totop{inset-inline-end:24px}
+
+#desknav{
+  position:fixed;inset-block:0;inset-inline-start:0;z-index:40;width:var(--desk-side);
+  display:flex;flex-direction:column;gap:14px;padding:18px 12px 14px;overflow-y:auto;
+  background:var(--bg-el);border-inline-end:var(--hair) solid var(--sep);
+}
+.dk-brand{display:flex;align-items:center;min-height:36px;padding:0 8px}
+#desknav.mini .dk-brand{justify-content:center;padding:0}
+.dk-start{
+  display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 12px;
+  border-radius:var(--r);background:var(--acc);color:var(--on-acc);font-weight:600;font-size:var(--fs-subhead);
+  transition:transform var(--fast),filter var(--fast);
+}
+.dk-start:hover{filter:brightness(1.08)}
+.dk-start:active{transform:scale(.98)}
+.dk-start:focus-visible{outline:2px solid var(--acc-ink);outline-offset:2px}
+.dk-start .tab-time{font-variant-numeric:tabular-nums}
+.dk-group{display:flex;flex-direction:column;gap:2px}
+.dk-group-t{padding:0 10px 4px;font-size:var(--fs-caption2);letter-spacing:.06em;text-transform:uppercase;color:var(--label-2)}
+.dk-foot{margin-top:auto;padding-top:10px;border-top:var(--hair) solid var(--sep)}
+.dk-item{
+  display:flex;align-items:center;gap:10px;min-height:40px;padding:0 10px;border-radius:10px;
+  color:var(--label-2);font-size:var(--fs-subhead);text-align:start;width:100%;
+  transition:background var(--fast),color var(--fast);
+}
+.dk-item:hover{background:var(--surface);color:var(--label)}
+.dk-item.on{background:var(--surface);color:var(--label);font-weight:600}
+.dk-item.on .dk-item-ic{color:var(--acc-ink)}
+.dk-item:focus-visible{outline:2px solid var(--acc-ink);outline-offset:-2px}
+.dk-item-ic{position:relative;flex:none;display:grid;place-items:center;width:20px;font-size:1.125rem}
+.dk-item-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#desknav.mini .dk-item,#desknav.mini .dk-start{justify-content:center;padding:0}
+
+/* ------------------------------------------------------------- wide pages -- */
+.dk-page .hdr{align-items:center}
+.dk-hdr-btns{display:flex;align-items:center;gap:8px}
+.dk-card{margin-bottom:16px}
+.dk-card-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;margin-bottom:12px}
+.dk-card-h h2,.card .dk-card-h h2{margin:0;font-size:var(--fs-body);font-weight:600;color:var(--label);letter-spacing:-.012em}
+.dk-dim{color:var(--label-2);font-size:var(--fs-footnote)}
+.dk-big{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.dk-note{margin:12px 0 0;padding:10px 12px;border-radius:var(--r);background:var(--surface-2);color:var(--label);font-size:var(--fs-subhead);line-height:1.4;white-space:pre-line;overflow-wrap:anywhere}
+.dk-cols{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:16px;align-items:start}
+.dk-cols > .dk-card{margin-bottom:0}
+
+/* status: a dot and a word, never the colour alone */
+.dk-st{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-footnote);color:var(--label);white-space:nowrap}
+.dk-st i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--label-3)}
+.dk-st.in i{background:var(--green)}
+.dk-st.below i{background:var(--orange)}
+.dk-st.above i{background:var(--red)}
+.dk-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:8px;background:var(--surface-2);color:var(--label);font-size:var(--fs-caption);white-space:nowrap}
+.dk-tag .icn{font-size:.8125rem;color:var(--acc-ink)}
+
+/* a track with a value bar, and (on the muscle rows) the target range behind it */
+.dk-track{position:relative;height:18px;border-radius:4px;background:var(--surface-2);min-width:0}
+.dk-track.flat{height:12px}
+.dk-band{position:absolute;inset-block:0;border-radius:4px;background:var(--surface-3)}
+.dk-val{position:absolute;inset-inline-start:0;top:6px;height:6px;border-radius:3px;background:var(--acc)}
+.dk-val.full{top:0;height:100%;border-radius:4px}
+
+/* --------------------------------------------------------------- overview -- */
+.dk-home{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:28px;align-items:start}
+.dk-main{min-width:0}
+/* Home, as it is on the phone, in a column of its own. Its title and gear are the sidebar's here. */
+.dk-today{min-width:0}
+.dk-today > .narrow{max-width:none;margin:0}
+.dk-today > .narrow > .hdr{display:none}
+.dk-kpis{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:12px;margin-bottom:16px}
+.dk-kpis .tile{min-width:0}
+.dk-kpi .v{font-variant-numeric:tabular-nums}
+.dk-kpi-s{margin-top:6px;color:var(--label-2);font-size:var(--fs-footnote)}
+.dk-readout{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-bottom:12px}
+.dk-bars{display:flex;align-items:flex-end;gap:6px;height:190px;border-bottom:1px solid var(--sep)}
+.dk-bar{flex:1 1 0;min-width:0;height:100%;display:flex;align-items:flex-end;padding:0;border-radius:4px 4px 0 0;cursor:pointer}
+.dk-bar span{display:block;width:100%;border-radius:4px 4px 0 0;background:var(--acc);opacity:.55;transition:opacity var(--fast)}
+.dk-bar.on span{opacity:1}
+.dk-bar:focus-visible{outline:2px solid var(--acc-ink);outline-offset:2px}
+.dk-bars-x{display:flex;gap:6px;margin-top:6px;color:var(--label-2);font-size:var(--fs-caption)}
+.dk-bars-x span{flex:1 1 0;min-width:0;text-align:center;white-space:nowrap}
+.dk-legend{display:flex;flex-wrap:wrap;gap:6px 14px;color:var(--label-2);font-size:var(--fs-footnote)}
+.dk-legend span{display:inline-flex;align-items:center;gap:6px}
+.dk-lg-done{width:18px;height:6px;border-radius:3px;background:var(--acc)}
+.dk-lg-range{width:18px;height:14px;border-radius:3px;background:var(--surface-3)}
+.dk-mus{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
+.dk-mus-row{display:grid;grid-template-columns:160px minmax(0,1fr) 110px 120px;gap:14px;align-items:center;min-height:36px}
+.dk-mus-n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-mus-v{text-align:end;font-variant-numeric:tabular-nums;font-size:var(--fs-subhead)}
+/* The list rows of a wide page stand in one column: two-up is for openGym's own full-width pages. */
+#app .dk-page .list{display:flex;flex-direction:column}
+
+/* ---------------------------------------------------------------- records -- */
+.dk-explain{display:flex;flex-wrap:wrap;gap:4px 24px;margin:0 0 16px;color:var(--label-2);font-size:var(--fs-subhead)}
+.dk-recs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:16px}
+.dk-rec{
+  display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:var(--r-card);text-align:start;
+  background:var(--surface);border:2px solid transparent;cursor:pointer;transition:border-color var(--fast),background var(--fast);
+}
+.dk-rec:hover{background:var(--surface-2)}
+.dk-rec.on{border-color:var(--acc)}
+.dk-rec:focus-visible{outline:2px solid var(--acc-ink);outline-offset:2px}
+.dk-rec.none{opacity:.75}
+.dk-rec-h{display:flex;flex-direction:column;gap:1px;min-width:0}
+.dk-rec-n{font-size:var(--fs-body);font-weight:600;letter-spacing:-.012em;overflow-wrap:anywhere}
+.dk-rec-s{color:var(--label-2);font-size:var(--fs-footnote)}
+.dk-bests{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dk-best{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dk-best-l{color:var(--label-2);font-size:var(--fs-caption)}
+.dk-best-v{font-size:1.375rem;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.dk-best-s{color:var(--label-2);font-size:var(--fs-footnote)}
+.dk-rec-empty{display:flex;flex-direction:column;gap:2px;color:var(--label-2);font-size:var(--fs-footnote)}
+.dk-rec-empty b{color:var(--label);font-size:var(--fs-subhead);font-weight:600}
+.dk-ladder{display:flex;flex-direction:column;gap:2px}
+.dk-rung{display:grid;grid-template-columns:84px minmax(0,1fr) 170px 190px;gap:12px;align-items:center;min-height:34px}
+.dk-rung-w{text-align:end;font-weight:600;font-variant-numeric:tabular-nums}
+.dk-rung-r{font-variant-numeric:tabular-nums;white-space:nowrap}
+.dk-rung-t{min-width:0}
+.dk-fresh + .dk-fresh{margin-top:14px;padding-top:12px;border-top:var(--hair) solid var(--sep)}
+.dk-fresh-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 12px;margin-bottom:4px}
+.dk-fresh-row{display:flex;align-items:center;gap:8px;width:100%;min-height:36px;padding:0 6px;border-radius:8px;text-align:start;font-size:var(--fs-subhead)}
+.dk-fresh-row:hover{background:var(--surface-2)}
+.dk-fresh-row:focus-visible{outline:2px solid var(--acc-ink);outline-offset:-2px}
+.dk-fresh-row .icn{flex:none;color:var(--acc-ink);font-size:.9375rem}
+.dk-choose{display:flex;flex-direction:column;margin-top:10px;max-height:48vh;overflow-y:auto}
+.dk-choose-row{display:flex;align-items:center;gap:12px;min-height:46px;padding:4px 2px;cursor:pointer}
+.dk-choose-row + .dk-choose-row{border-top:var(--hair) solid var(--sep)}
+
+/* A window narrower than the Overview's two columns want (the sidebar open on a small laptop):
+   Home's column goes under the charts instead of squeezing them. */
+@media (max-width:1280px){
+  .dk-home{grid-template-columns:minmax(0,1fr)}
+  .dk-today > .narrow{max-width:640px}
+  .dk-cols{grid-template-columns:minmax(0,1fr)}
+}
