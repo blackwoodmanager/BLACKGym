@@ -87,6 +87,13 @@ export function isOn(S, id) {
   return true
 }
 
+/**
+ * Whether the "Check in" card shows on Home. The Gym check-in module decides whether the feature
+ * exists at all; S.homeCheckIn (Settings, On Home) only folds this one card away, so the codes
+ * and NFC stickers stay. A missing key is shown.
+ */
+export const checkInOnHome = S => isOn(S, 'checkin') && S?.homeCheckIn !== false
+
 /** { [id]: boolean } for every module, as this profile has them now. */
 export function moduleStates(S) {
   return Object.fromEntries(MODULE_IDS.map(id => [id, isOn(S, id)]))

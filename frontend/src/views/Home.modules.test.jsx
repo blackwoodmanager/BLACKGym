@@ -66,4 +66,12 @@ describe('Home follows the modules', () => {
     mountWith({ checkin: true }, { checkIn: false })
     expect(heads()).toContain('Check in')
   })
+
+  it('Settings → On Home → Check in folds only the card away, the module stays on', () => {
+    mountWith(undefined, { checkIn: true, homeCheckIn: false })
+    expect(heads()).not.toContain('Check in')
+    expect(heads()).toContain('Body weight')
+    mountWith(undefined, { checkIn: true, homeCheckIn: true })
+    expect(heads()).toContain('Check in')
+  })
 })
