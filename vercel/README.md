@@ -137,8 +137,9 @@ passkey, for the real app only: a preview has another address and its own data.
    | `OIDC_SCOPES` | `openid profile` |
 
 3. Redeploy production, so the new variables are read.
-4. Sign in with the passkey once more, then Settings → Account → link Telegram. It asks for the
-   passkey, like adding one. From then on the sign-in screen's "Sign in with Telegram" opens this
+4. Sign in with the passkey once more, then Settings → "Sign in with Telegram" (BlackGym shows
+   the row on the first Settings page as well as in Account: `components/ProviderLinkRow.jsx`,
+   one line in `views/Settings.jsx`). It asks for the passkey, like adding one. From then on the sign-in screen's "Sign in with Telegram" opens this
    profile.
 
 Who gets in: only a profile that linked its Telegram account. With `BLACKGYM_SIGNUP=owner` (the

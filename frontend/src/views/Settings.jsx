@@ -80,6 +80,7 @@ import { ServerSyncSection, KeptChangesRows, leaveServer, connectServer, passkey
 import { passwordOn, PasswordRow, openPasswordSignIn, openPasswordRegister } from '../components/PasswordAuth.jsx'
 import { usePasskeys, PasskeysRow, DeviceLinkRow, openDeviceLinkRedeem, PairSheet } from '../components/Passkeys.jsx'
 import { OidcRow } from '../components/OidcAccount.jsx'
+import ProviderLinkRow from '../components/ProviderLinkRow.jsx'
 import { DeleteAccountRow } from '../components/DeleteAccount.jsx'
 import { warmupAutoOf } from '../lib/warmup-ramp.js'
 import { MACHINE_EQ, machinesSummary } from '../lib/machine-kinds.js'
@@ -1504,6 +1505,8 @@ function SettingsRoot({ ctx, preview, open, user, sync, home, go, entryKey }) {
           {ctx.mod('motivation') && <PinnedBadges />}
           <Icon name="chevronRight" className="lrow-c" />
         </button>
+        {/* BlackGym: "Sign in with Telegram" here too, not only one level down in Account. */}
+        {!DEMO && <ProviderLinkRow />}
       </Section>
       {ROOT_GROUPS.map(g => ({ ...g, ids: g.ids.filter(id => onRoot(id, ctx)) })).filter(g => g.ids.length).map(g => (
         <Section key={g.ids[0]} title={g.title && t(g.title)}>
