@@ -328,7 +328,7 @@ main.api-main .lead { color: var(--fg-2); max-width: 58ch; margin: 14px 0 0; fon
   <p class="api-facts">
     <span>OpenAPI 3.1.0</span>
     <span>openGym v1.4.5</span>
-    <span>178 endpoints</span>
+    <span>180 endpoints</span>
     <span>AGPL-3.0-or-later</span>
   </p>
 
@@ -6360,9 +6360,84 @@ main.api-main .lead { color: var(--fg-2); max-width: 58ch; margin: 14px 0 0; fon
     <span class="p-desc"></span>
   </div>
   <div class="prow">
-    <span class="p-name">text<em class="p-req" title="required">required</em></span>
+    <span class="p-name">text</span>
     <span class="p-type">string <span class="p-hint">(&le; 4000 chars)</span></span>
     <span class="p-desc">What went wrong, or what to change.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks</span>
+    <span class="p-type">object[]</span>
+    <span class="p-desc">The places on screen the request is about, marked in the app.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].n</span>
+    <span class="p-type">integer <span class="p-hint">(1&ndash;99)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].note</span>
+    <span class="p-type">string <span class="p-hint">(&le; 500 chars)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].what</span>
+    <span class="p-type">string <span class="p-hint">(&le; 120 chars)</span></span>
+    <span class="p-desc">What the element is</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].selector</span>
+    <span class="p-type">string <span class="p-hint">(&le; 200 chars)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].route</span>
+    <span class="p-type">string <span class="p-hint">(&le; 120 chars)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].html</span>
+    <span class="p-type">string <span class="p-hint">(&le; 400 chars)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].rect</span>
+    <span class="p-type">object</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].rect.x</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].rect.y</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].rect.w</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].rect.h</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].viewport</span>
+    <span class="p-type">object</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].viewport.w</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].viewport.h</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
   </div>
   <div class="prow">
     <span class="p-name">requestId</span>
@@ -6409,6 +6484,129 @@ main.api-main .lead { color: var(--fg-2); max-width: 58ch; margin: 14px 0 0; fon
   <div class="prow rrow">
     <span class="r-code s5">502</span>
     <span class="p-desc">The orchestrator did not answer or refused (<code>code</code>: orchestrator-down, orchestrator-refused).</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s5">503</span>
+    <span class="p-desc">Not set up on this server (<code>code</code>: feedback-off).</span>
+  </div>
+    </div>
+  </div>
+</details>
+
+<details class="ep" id="op-getFeedback">
+  <summary>
+    <span class="m get">GET</span>
+    <span class="ep-path"><code>/api/feedback</code><span class="ep-chip admin">admin</span></span>
+    <span class="ep-chev" aria-hidden="true"></span>
+    <span class="ep-sum">The bug-button requests and where each one stands</span>
+  </summary>
+  <div class="ep-body">
+<p>&quot;My fixes&quot;: the orchestrator's requests from this app, newest first (up to 60), cut down to what the screen draws. <code>stage</code> says where one is: <code>queued</code>, <code>running</code>, <code>waiting</code> (the agent asked something: <code>ask</code> and <code>askOptions</code>), <code>shipping</code> (merged, the site is updating), <code>review</code> (done, waiting for the owner to check it), <code>closed</code> (accepted), <code>failed</code>, <code>cancelled</code>, <code>paused</code>. Admin only; 503 with <code>code: feedback-off</code> while the bug button is not set up.</p>
+    <p class="ep-auth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Admin only: a signed-in session whose user is an admin (<code>ADMIN_UIDS</code> or <code>admin:true</code>), as the session cookie or a Bearer token.</span></p>
+
+
+    <p class="ep-h">Responses</p>
+    <div class="ptab">
+  <div class="prow rrow">
+    <span class="r-code s2">200</span>
+    <span class="p-desc">The requests.<span class="r-sig">{ ok: boolean, items: <a href="#schema-FeedbackItem">FeedbackItem</a>[] }</span></span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">401</span>
+    <span class="p-desc">No session, expired/revoked session, or a disabled account.<span class="r-sig"><code>{&quot;error&quot;:&quot;not signed in&quot;}</code></span></span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">403</span>
+    <span class="p-desc">Not an admin.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s5">502</span>
+    <span class="p-desc">The orchestrator did not answer or refused.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s5">503</span>
+    <span class="p-desc">Not set up on this server (<code>code</code>: feedback-off).</span>
+  </div>
+    </div>
+  </div>
+</details>
+
+<details class="ep" id="op-postFeedbackAct">
+  <summary>
+    <span class="m post">POST</span>
+    <span class="ep-path"><code>/api/feedback/act</code><span class="ep-chip admin">admin</span></span>
+    <span class="ep-chev" aria-hidden="true"></span>
+    <span class="ep-sum">Accept, send back, answer or cancel one bug-button request</span>
+  </summary>
+  <div class="ep-body">
+<p>The owner's decision on one request, passed to the orchestrator. <code>accept</code> closes a request that is in <code>review</code>; <code>rework</code> sends it back with a reason (<code>note</code>, required); <code>reply</code> answers the agent while the request is <code>waiting</code> (<code>choice</code> is one of its <code>askOptions</code>, or <code>text</code>); <code>cancel</code> stops a request that is not done yet. Anything that does not fit the request's stage is a 409 with <code>code: wrong-stage</code> and the current <code>stage</code>. Admin only. The audit log records the action, never the text.</p>
+    <p class="ep-auth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Admin only: a signed-in session whose user is an admin (<code>ADMIN_UIDS</code> or <code>admin:true</code>), as the session cookie or a Bearer token.</span></p>
+
+<p class="ep-h">Request body <span class="p-hint">(JSON)</span></p><div class="ptab">
+  <div class="prow">
+    <span class="p-name">action<em class="p-req" title="required">required</em></span>
+    <span class="p-type">&quot;accept&quot; | &quot;rework&quot; | &quot;reply&quot; | &quot;cancel&quot;</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">id<em class="p-req" title="required">required</em></span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">note</span>
+    <span class="p-type">string <span class="p-hint">(&le; 1000 chars)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">choice</span>
+    <span class="p-type">string <span class="p-hint">(&le; 80 chars)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">text</span>
+    <span class="p-type">string <span class="p-hint">(&le; 1000 chars)</span></span>
+    <span class="p-desc"></span>
+  </div>
+</div>
+<pre><code>{
+  &quot;action&quot;: &quot;rework&quot;,
+  &quot;id&quot;: &quot;fa-1800000000000-a1b2c3&quot;,
+  &quot;note&quot;: &quot;The button is there but does nothing.&quot;
+}</code></pre>
+    <p class="ep-h">Responses</p>
+    <div class="ptab">
+  <div class="prow rrow">
+    <span class="r-code s2">200</span>
+    <span class="p-desc">Done.<span class="r-sig">{ ok: boolean, stage: string }</span></span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">400</span>
+    <span class="p-desc">Unknown action, bad id, a missing reason or answer, or an answer that is not one of the options.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">401</span>
+    <span class="p-desc">No session, expired/revoked session, or a disabled account.<span class="r-sig"><code>{&quot;error&quot;:&quot;not signed in&quot;}</code></span></span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">403</span>
+    <span class="p-desc">Not an admin.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">404</span>
+    <span class="p-desc">No such request.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">409</span>
+    <span class="p-desc">Not possible at the stage the request is in (<code>code</code>: wrong-stage, with <code>stage</code>).</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">429</span>
+    <span class="p-desc">The orchestrator's hourly limit.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s5">502</span>
+    <span class="p-desc">The orchestrator did not answer or refused.</span>
   </div>
   <div class="prow rrow">
     <span class="r-code s5">503</span>
@@ -8146,6 +8344,149 @@ main.api-main .lead { color: var(--fg-2); max-width: 58ch; margin: 14px 0 0; fon
     <span class="p-name">plainHttp</span>
     <span class="p-type">boolean</span>
     <span class="p-desc"></span>
+  </div>
+</div>
+  </div>
+</details>
+
+<details class="ep sch" id="schema-FeedbackItem">
+  <summary>
+    <span class="sch-name"><code>FeedbackItem</code></span>
+    <span class="ep-chev" aria-hidden="true"></span>
+    <span class="ep-sum">One bug-button request as the &quot;My fixes&quot; screen draws it.</span>
+  </summary>
+  <div class="ep-body">
+
+<div class="ptab">
+  <div class="prow">
+    <span class="p-name">id</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">title</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">kind</span>
+    <span class="p-type">&quot;bug&quot; | &quot;idea&quot;</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">stage</span>
+    <span class="p-type">&quot;queued&quot; | &quot;running&quot; | &quot;waiting&quot; | &quot;shipping&quot; | &quot;review&quot; | &quot;closed&quot; | &quot;failed&quot; | &quot;cancelled&quot; | &quot;paused&quot;</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">progress</span>
+    <span class="p-type">integer <span class="p-hint">(0&ndash;100)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">summary</span>
+    <span class="p-type">string</span>
+    <span class="p-desc">What was done</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">ask</span>
+    <span class="p-type">string</span>
+    <span class="p-desc">What the agent asks; only while <code>waiting</code>.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">askOptions</span>
+    <span class="p-type">string[]</span>
+    <span class="p-desc">Up to 4 ready answers.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">askKind</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">links</span>
+    <span class="p-type">object[]</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">links[].url</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">links[].title</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks</span>
+    <span class="p-type">object[]</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].n</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].note</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].what</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">marks[].route</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">review</span>
+    <span class="p-type">object</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">review.state</span>
+    <span class="p-type">&quot;accepted&quot; | &quot;rework&quot;</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">review.note</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">review.at</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">open</span>
+    <span class="p-type">boolean</span>
+    <span class="p-desc">False once the request is closed</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">createdAt</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">updatedAt</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">finishedAt</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">link</span>
+    <span class="p-type">string</span>
+    <span class="p-desc">The request on the orchestrator's board (https).</span>
   </div>
 </div>
   </div>

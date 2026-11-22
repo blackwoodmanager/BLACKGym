@@ -15,7 +15,7 @@ import * as coachConfig from './coach/config.js';
 import * as coachJobs from './coach/jobs.js';
 import { coachRoutes } from './coach/routes.js';
 import { startCadence } from './coach/cadence.js';
-import { feedbackConfig, parseFeedback, forwardFeedback, FeedbackError } from './feedback.js';
+import { feedbackConfig, parseFeedback, forwardFeedback, listFeedback, parseAct, actOnFeedback, FeedbackError } from './feedback.js';
 import { startWarmup } from './coach/warmup.js';
 import { dayReminderPush, nudgePush, restTimerPush, testPush } from './push-messages.js';
 import { reminderOf as checkinReminderOf, dueKeys as checkinDueKeys, dueKind as checkinDueKind, checkinPush } from './checkin-reminder.js';
@@ -2540,6 +2540,21 @@ function oauthRoutes() {
   };
 }
 
+// The bug button's three routes share one guard: a session, an admin, and an orchestrator that is wired.
+function feedbackGate(req, res) {
+  const user = readSession(req);
+  if (!user) { json(res, 401, { error: 'not signed in' }); return null; }
+  if (!isAdmin(user)) { json(res, 403, { error: 'admins only' }); return null; }
+  const config = feedbackConfig();
+  if (!config) { json(res, 503, { error: 'the bug button is not set up on this server', code: 'feedback-off' }); return null; }
+  return { user, config };
+}
+function feedbackFailed(req, res, user, e, record = true) {
+  if (!(e instanceof FeedbackError)) throw e;
+  if (record && e.status >= 500) audit(req, 'feedback.sent', { ok: false, user, msg: e.code });
+  json(res, e.status, { error: e.message, ...(e.code ? { code: e.code } : {}), ...(e.stage ? { stage: e.stage } : {}) });
+}
+
 const routes = {
   // 503 rather than a flag in a 200: the container healthcheck is `wget --spider`, which reads
   // the status and nothing else, and an instance that cannot write its data directory is exactly
@@ -3357,23 +3372,30 @@ const routes = {
 
   /* ---------- the bug button ---------- */
   // BlackGym only: the app's bug button posts here, and the request goes on to the orchestrator
-  // (feedback.js), which queues it as a task. Admins only, and only where the orchestrator is wired.
+  // (feedback.js), which queues it as a task. "My fixes" reads the list and answers through the
+  // same road. Admins only, and only where the orchestrator is wired.
   'POST /api/feedback': async (req, res) => {
-    const user = readSession(req);
-    if (!user) return json(res, 401, { error: 'not signed in' });
-    if (!isAdmin(user)) return json(res, 403, { error: 'admins only' });
-    const config = feedbackConfig();
-    if (!config) return json(res, 503, { error: 'the bug button is not set up on this server', code: 'feedback-off' });
+    const gate = feedbackGate(req, res); if (!gate) return;
     try {
       const fb = parseFeedback(await readBody(req));
-      const out = await forwardFeedback({ config, fb, user });
-      audit(req, 'feedback.sent', { user, msg: fb.kind });
+      const out = await forwardFeedback({ config: gate.config, fb, user: gate.user });
+      audit(req, 'feedback.sent', { user: gate.user, msg: fb.kind });
       json(res, 200, { ok: true, ...out });
-    } catch (e) {
-      if (!(e instanceof FeedbackError)) throw e;
-      if (e.status >= 500) audit(req, 'feedback.sent', { ok: false, user, msg: e.code });
-      json(res, e.status, { error: e.message, ...(e.code ? { code: e.code } : {}) });
-    }
+    } catch (e) { feedbackFailed(req, res, gate.user, e); }
+  },
+  'GET /api/feedback': async (req, res) => {
+    const gate = feedbackGate(req, res); if (!gate) return;
+    try { json(res, 200, { ok: true, ...(await listFeedback({ config: gate.config })) }); }
+    catch (e) { feedbackFailed(req, res, gate.user, e, false); }
+  },
+  'POST /api/feedback/act': async (req, res) => {
+    const gate = feedbackGate(req, res); if (!gate) return;
+    try {
+      const act = parseAct(await readBody(req));
+      const out = await actOnFeedback({ config: gate.config, act });
+      audit(req, 'feedback.act', { user: gate.user, msg: act.action });
+      json(res, 200, { ok: true, ...out });
+    } catch (e) { feedbackFailed(req, res, gate.user, e); }
   },
 
   /* ---------- admin dashboard ---------- */

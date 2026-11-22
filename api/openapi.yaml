@@ -3590,13 +3590,32 @@ paths:
           application/json:
             schema:
               type: object
-              required: [text]
+              description: Either `text` or at least one mark with a note is required.
               properties:
                 kind: { type: string, enum: [bug, idea], default: bug }
                 text:
                   type: string
                   maxLength: 4000
                   description: What went wrong, or what to change.
+                marks:
+                  type: array
+                  maxItems: 10
+                  description: The places on screen the request is about, marked in the app.
+                  items:
+                    type: object
+                    properties:
+                      n: { type: integer, minimum: 1, maximum: 99 }
+                      note: { type: string, maxLength: 500 }
+                      what: { type: string, maxLength: 120, description: What the element is, in words ("button Start"). }
+                      selector: { type: string, maxLength: 200 }
+                      route: { type: string, maxLength: 120 }
+                      html: { type: string, maxLength: 400 }
+                      rect:
+                        type: object
+                        properties: { x: { type: integer }, y: { type: integer }, w: { type: integer }, h: { type: integer } }
+                      viewport:
+                        type: object
+                        properties: { w: { type: integer }, h: { type: integer } }
                 requestId:
                   type: string
                   pattern: '^[A-Za-z0-9_-]{8,64}$'
@@ -3627,6 +3646,77 @@ paths:
         '403': { description: Not an admin., content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
         '429': { description: The orchestrator's hourly limit for this app., content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
         '502': { description: 'The orchestrator did not answer or refused (`code`: orchestrator-down, orchestrator-refused).', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '503': { description: 'Not set up on this server (`code`: feedback-off).', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+    get:
+      tags: [admin]
+      operationId: getFeedback
+      summary: 'Admin: the bug-button requests and where each one stands'
+      description: |
+        "My fixes": the orchestrator's requests from this app, newest first (up to 60), cut down to
+        what the screen draws. `stage` says where one is: `queued`, `running`, `waiting` (the agent
+        asked something: `ask` and `askOptions`), `shipping` (merged, the site is updating), `review`
+        (done, waiting for the owner to check it), `closed` (accepted), `failed`, `cancelled`, `paused`.
+        Admin only; 503 with `code: feedback-off` while the bug button is not set up.
+      responses:
+        '200':
+          description: The requests.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/FeedbackItem' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Not an admin., content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '502': { description: 'The orchestrator did not answer or refused.', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '503': { description: 'Not set up on this server (`code`: feedback-off).', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /api/feedback/act:
+    post:
+      tags: [admin]
+      operationId: postFeedbackAct
+      summary: 'Admin: accept, send back, answer or cancel one bug-button request'
+      description: |
+        The owner's decision on one request, passed to the orchestrator. `accept` closes a request
+        that is in `review`; `rework` sends it back with a reason (`note`, required); `reply` answers
+        the agent while the request is `waiting` (`choice` is one of its `askOptions`, or `text`);
+        `cancel` stops a request that is not done yet. Anything that does not fit the request's stage is a
+        409 with `code: wrong-stage` and the current `stage`. Admin only. The audit log records the action, never the text.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, id]
+              properties:
+                action: { type: string, enum: [accept, rework, reply, cancel] }
+                id: { type: string, pattern: '^fa-\d{10,16}-[0-9a-f]{6}$' }
+                note: { type: string, maxLength: 1000 }
+                choice: { type: string, maxLength: 80 }
+                text: { type: string, maxLength: 1000 }
+            example: { action: rework, id: fa-1800000000000-a1b2c3, note: The button is there but does nothing. }
+      responses:
+        '200':
+          description: Done.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  stage: { type: string, nullable: true, description: The stage the request is in now. }
+        '400': { description: 'Unknown action, bad id, a missing reason or answer, or an answer that is not one of the options.', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Not an admin., content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '404': { description: No such request., content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '409': { description: 'Not possible at the stage the request is in (`code`: wrong-stage, with `stage`).', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '429': { description: The orchestrator's hourly limit., content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '502': { description: 'The orchestrator did not answer or refused.', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
         '503': { description: 'Not set up on this server (`code`: feedback-off).', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
 
   /api/admin/users:
@@ -6416,6 +6506,34 @@ components:
         lastErrorAt: { type: [integer, 'null'] }
         linked: { type: integer, description: Profiles linked to the provider. }
         plainHttp: { type: boolean }
+    FeedbackItem:
+      type: object
+      description: One bug-button request as the "My fixes" screen draws it.
+      properties:
+        id: { type: string, example: fa-1800000000000-a1b2c3 }
+        title: { type: string }
+        kind: { type: string, enum: [bug, idea] }
+        stage: { type: string, enum: [queued, running, waiting, shipping, review, closed, failed, cancelled, paused] }
+        progress: { type: integer, minimum: 0, maximum: 100 }
+        summary: { type: string, description: What was done, in a sentence; present when the request is done or failed. }
+        ask: { type: string, description: What the agent asks; only while `waiting`. }
+        askOptions: { type: array, items: { type: string }, description: Up to 4 ready answers. }
+        askKind: { type: string }
+        links:
+          type: array
+          items: { type: object, properties: { url: { type: string }, title: { type: string } } }
+        marks:
+          type: array
+          items: { type: object, properties: { n: { type: integer }, note: { type: string }, what: { type: string }, route: { type: string } } }
+        review:
+          type: object
+          nullable: true
+          properties: { state: { type: string, enum: [accepted, rework] }, note: { type: string }, at: { type: integer, nullable: true } }
+        open: { type: boolean, description: False once the request is closed, failed or cancelled. }
+        createdAt: { type: integer, nullable: true }
+        updatedAt: { type: integer, nullable: true }
+        finishedAt: { type: integer, nullable: true }
+        link: { type: string, nullable: true, description: The request on the orchestrator's board (https). }
     SessionUser:
       type: object
       description: The caller's identity, as returned by /api/me and the sign-in routes.
