@@ -15,9 +15,28 @@ What differs from openGym outside this folder:
 | `frontend/src/store/useStore.js` | A new profile starts in the theme and the accent colour `brand.json` asks for (`defaults.theme`, `defaults.accent`). |
 | `api/feedback.js` (new), `api/server.js`, `api/Dockerfile`, `api/openapi.yaml`, `website/api.html` | The bug button's server half: `POST /api/feedback` (admins only) passes a request on to the orchestrator; `GET /api/feedback` lists the requests and `POST /api/feedback/act` carries the owner's decision on one. `/api/me` tells an admin `feedback: true` when it is set up. One route, one flag, one import. `website/api.html` is generated from `openapi.yaml`. |
 | `frontend/src/components/FeedbackBug.jsx`, `FeedbackSheet.jsx`, `FeedbackMarkup.jsx`, `views/Fixes.jsx`, `lib/feedback.js`, `feedback-draft.js`, `feedback-fixes.js` (new), `App.jsx`, `components/Icon.jsx`, `index.css` | The bug button itself: a small tab on the screen's edge, its sheet, marking places on the screen, and the "My fixes" screen (`/fixes`) with each request's status and the owner's accept, send back, reply and cancel. `App.jsx` gets a lazy view, a route and two mounts, `Icon.jsx` the `bug` icon, `index.css` a few rules. |
+| `frontend/src/desktop/` (new), `lib/base-records.js`, `lib/desk-overview.js` (new), `App.jsx` | BlackGym on a computer, see below. Everything lives in the new folder and the two helpers; `App.jsx` imports it, picks the wide Overview for `/home`, adds a route and renders the sidebar. No rule in `index.css` is changed. |
 
 Without a deployment brand (openGym itself) the brand changes do nothing, and the bug button stays
 off on any server where `ORCH_FEEDBACK_URL` and `ORCH_FEEDBACK_TOKEN` are not both set.
+
+## BlackGym on a computer
+
+In a window at least 1100 px wide that is driven by a mouse (`frontend/src/desktop/use-desktop.js`),
+the web app gets a layout of its own. A phone, a tablet in the hand and the phone apps never see
+it: they keep openGym's screens as they are.
+
+| Part | What it is |
+|---|---|
+| Sidebar (`DesktopNav.jsx`) | Takes the tab bar's place: Start, then every screen that sits behind Home and Stats on a phone. Folds down to icons (remembered per browser). |
+| Overview (`DeskHome.jsx`, `/home`) | The week in numbers, volume per week for 12 weeks, sets per muscle against the target range, recent workouts. Beside it, openGym's own Home as it is on the phone, so nothing Home does is missing. |
+| Records (`Records.jsx`, `/records`) | The base lifts and two bests each: the heaviest set, and the biggest set (weight x reps), with the best set at every weight in between (`lib/base-records.js`). Which lifts are "base" is the owner's own list, `S.baseEx`, a plain synced setting; until it is chosen, the logged lifts that look like base lifts plus bench press, squat, deadlift and pull-up. |
+| My fixes (`views/Fixes.jsx`, `/fixes`) | The bug button's own screen, reached from the sheet on a phone. The sidebar gives it an entry of its own for the one person who has the button. |
+
+Every other screen is openGym's own, shown in its usual column inside the new frame. The layer's
+words are in `desktop/copy.js` (English, Russian, Ukrainian) and not in the language packs, for
+the same reason as the bug button's. Its styles are in `desktop/desktop.css`, every rule under
+`body.desk` or a `dk-` class.
 
 ## How it works
 
