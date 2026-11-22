@@ -101,7 +101,7 @@ import MyTrainerPage from './MyTrainer.jsx'
 import { libraryOn } from '../lib/shared-api.js'
 import ZeppSettingsPage from './ZeppSettings.jsx'
 import ModulesPage from './Modules.jsx'
-import { isOn, presetOf } from '../lib/modules.js'
+import { isOn, presetOf, checkInOnHome } from '../lib/modules.js'
 import { presetCopy } from '../lib/modules-copy.js'
 import { reportSheet } from '../components/ReportSheet.jsx'
 import { csvExportSheet } from '../components/CsvExportSheet.jsx'
@@ -1146,7 +1146,11 @@ export default function Settings({ page = null, find = null, via = null, entryKe
           value={activeSeasonTitle(S)} accessory="chevron" onClick={() => open('themes')} />
       </Section>}
       <Section title={t('On Home')}>
-        {/* The gym check-in's own switch moved to Settings → Modules (1.4.4, lib/modules.js). */}
+        {/* The gym check-in itself is Settings → Modules (1.4.4, lib/modules.js); this switch only
+            folds its card away on Home, so the codes stay on the Check in screen. */}
+        {on('checkin') && <Row icon="qr" iconTint="var(--blue)" title={t('Check in')} subtitle={t('At the gym')}>
+          <Switch aria-label={t('Check in')} checked={checkInOnHome(S)} onChange={v => update(s => { s.homeCheckIn = v })} />
+        </Row>}
         {/* NFC stickers (components/Nfc.jsx): only where the phone or the browser can write one. */}
         {nfcOK && on('checkin') && <Row icon="nfc" iconTint="var(--blue)" title={t('Set up an NFC sticker')}
           subtitle={t('Tap it at the gym to start your workout or show your code.')} accessory="chevron" onClick={nfcStickerSheet} />}

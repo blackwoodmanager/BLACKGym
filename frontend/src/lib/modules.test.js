@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MODULES, MODULE_IDS, GROUPS, PRESETS, isOn, moduleStates, presetModules, presetOf, applyPreset, setModule, turnedOff, onCount } from './modules.js'
+import { MODULES, MODULE_IDS, GROUPS, PRESETS, isOn, moduleStates, presetModules, presetOf, applyPreset, setModule, turnedOff, onCount, checkInOnHome } from './modules.js'
 
 describe('modules', () => {
   it('every module belongs to a group, with an icon and copy', () => {
@@ -69,5 +69,15 @@ describe('modules', () => {
   it('names what a change switches off', () => {
     expect(turnedOff({}, presetModules('training')).sort()).toEqual(['body', 'checkin', 'coach', 'community', 'health', 'integrations', 'motivation', 'seasonal', 'strength', 'videos'])
     expect(turnedOff({ modules: { body: false } }, { body: false, coach: false })).toEqual(['coach'])
+  })
+
+  it('the Home check-in card has its own switch under the module', () => {
+    expect(checkInOnHome({})).toBe(true)
+    expect(checkInOnHome({ homeCheckIn: false })).toBe(false)
+    expect(checkInOnHome({ homeCheckIn: true })).toBe(true)
+    // The module off wins: no feature, no card.
+    expect(checkInOnHome({ modules: { checkin: false }, homeCheckIn: true })).toBe(false)
+    // Folding the card away leaves the module on, so the codes and NFC stickers stay.
+    expect(isOn({ homeCheckIn: false }, 'checkin')).toBe(true)
   })
 })
