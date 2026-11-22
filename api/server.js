@@ -15,6 +15,7 @@ import * as coachConfig from './coach/config.js';
 import * as coachJobs from './coach/jobs.js';
 import { coachRoutes } from './coach/routes.js';
 import { startCadence } from './coach/cadence.js';
+import { feedbackConfig, parseFeedback, forwardFeedback, FeedbackError } from './feedback.js';
 import { startWarmup } from './coach/warmup.js';
 import { dayReminderPush, nudgePush, restTimerPush, testPush } from './push-messages.js';
 import { reminderOf as checkinReminderOf, dueKeys as checkinDueKeys, dueKind as checkinDueKind, checkinPush } from './checkin-reminder.js';
@@ -1425,7 +1426,7 @@ function loginTarget(body) {
 }
 const acctKey = u => 'acct:' + u.id;
 const passkeyCount = u => db.creds.filter(c => c.userId === u.id).length;
-const publicUser = u => ({ id: u.id, name: u.name, admin: isAdmin(u), ...(isOwner(u) ? { owner: true } : {}), ...(oidcWayIn(u) ? { oidc: true } : {}) });
+const publicUser = u => ({ id: u.id, name: u.name, admin: isAdmin(u), ...(isOwner(u) ? { owner: true } : {}), ...(oidcWayIn(u) ? { oidc: true } : {}), ...(isAdmin(u) && feedbackConfig() ? { feedback: true } : {}) });
 // A linked provider identity is a way in while the provider is configured (and the same issuer).
 const oidcWayIn = u => !!(OIDC.enabled && u?.oidc && String(u.oidc.iss || '').replace(/\/+$/, '') === OIDC.issuer);
 // The ways in besides passkeys, for "never remove the last one".
@@ -3352,6 +3353,27 @@ const routes = {
       if (p && p.hiddenAt === undefined) p.hiddenAt = Date.now();
     } else presence.delete(user.id);
     json(res, 200, { ok: true });
+  },
+
+  /* ---------- the bug button ---------- */
+  // BlackGym only: the app's bug button posts here, and the request goes on to the orchestrator
+  // (feedback.js), which queues it as a task. Admins only, and only where the orchestrator is wired.
+  'POST /api/feedback': async (req, res) => {
+    const user = readSession(req);
+    if (!user) return json(res, 401, { error: 'not signed in' });
+    if (!isAdmin(user)) return json(res, 403, { error: 'admins only' });
+    const config = feedbackConfig();
+    if (!config) return json(res, 503, { error: 'the bug button is not set up on this server', code: 'feedback-off' });
+    try {
+      const fb = parseFeedback(await readBody(req));
+      const out = await forwardFeedback({ config, fb, user });
+      audit(req, 'feedback.sent', { user, msg: fb.kind });
+      json(res, 200, { ok: true, ...out });
+    } catch (e) {
+      if (!(e instanceof FeedbackError)) throw e;
+      if (e.status >= 500) audit(req, 'feedback.sent', { ok: false, user, msg: e.code });
+      json(res, e.status, { error: e.message, ...(e.code ? { code: e.code } : {}) });
+    }
   },
 
   /* ---------- admin dashboard ---------- */

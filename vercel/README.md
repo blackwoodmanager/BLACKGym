@@ -1,9 +1,9 @@
 # BlackGym on Vercel
 
 BlackGym is a personal, non-commercial deployment of [openGym](https://github.com/DuarteSantos8/openGym)
-(AGPL-3.0-or-later). This folder is everything that was added to run it on Vercel. `api/` and
-`catalogue/` are unchanged, and `frontend/` differs from openGym in one small place, listed below,
-so openGym's own updates merge with little or no conflict.
+(AGPL-3.0-or-later). This folder is everything that was added to run it on Vercel. `catalogue/` is
+unchanged, and `api/` and `frontend/` differ from openGym in a few small places, listed below, so
+openGym's own updates merge with little or no conflict.
 
 What differs from openGym outside this folder:
 
@@ -13,8 +13,11 @@ What differs from openGym outside this folder:
 | `frontend/src/lib/app-icon.js`, `components/AppIconRow.jsx`, `views/Settings.jsx` | Settings → Look & Home → App icon is offered in a browser too when the deployment ships icons of its own. |
 | `frontend/src/components/BrandLogo.jsx`, `views/Login.jsx` | The sign-in screen shows the deployment's logo, and its own line under it when `brand.json` has a `tagline`. |
 | `frontend/src/store/useStore.js` | A new profile starts in the theme and the accent colour `brand.json` asks for (`defaults.theme`, `defaults.accent`). |
+| `api/feedback.js` (new), `api/server.js`, `api/Dockerfile`, `api/openapi.yaml`, `website/api.html` | The bug button's server half: `POST /api/feedback` (admins only) passes a request on to the orchestrator. `/api/me` tells an admin `feedback: true` when it is set up. One route, one flag, one import. `website/api.html` is generated from `openapi.yaml`. |
+| `frontend/src/components/FeedbackBug.jsx`, `lib/feedback.js` (new), `App.jsx`, `components/Icon.jsx`, `index.css` | The bug button itself: a small tab on the screen's edge and its sheet. `App.jsx` gets one line, `Icon.jsx` the `bug` icon, `index.css` a few rules. |
 
-Without a deployment brand (openGym itself) none of these changes anything.
+Without a deployment brand (openGym itself) the brand changes do nothing, and the bug button stays
+off on any server where `ORCH_FEEDBACK_URL` and `ORCH_FEEDBACK_TOKEN` are not both set.
 
 ## How it works
 
@@ -86,6 +89,7 @@ repository root) can be set as Vercel environment variables and reach the API un
 | `BLACKGYM_DB_SCHEMA` | `blackgym_<production\|preview\|development>` | Where the data lives in the database. Production and previews are separate on purpose. |
 | `BLACKGYM_SNAPSHOT_DAYS` | `30` | How many days of daily snapshots to keep. `0` turns them off. |
 | `BLACKGYM_MAX_DURATION` | `300` | Seconds a request may run (build time). 300 is the Hobby plan's limit with Fluid Compute. |
+| `ORCH_FEEDBACK_URL`, `ORCH_FEEDBACK_TOKEN` | none | The bug button. The orchestrator's address (`https://…`) and its app-feedback key (`ORCH_APP_FEEDBACK_TOKEN` over there), 32 characters or more. Both set: an admin sees a small bug tab on the screen's edge, and what they write there is queued as a task in the orchestrator's `blackgym` project. Either missing: no button. The key stays on the server. |
 | `CRON_SECRET` | none | When set, `/api/cron/tick` needs `Authorization: Bearer <value>`. Vercel Cron sends it by itself. |
 | `MEDIA_VIDEO_MAX_MB`, `MEDIA_GIF_MAX_MB`, `MEDIA_QUOTA_MB` | `4`, `4`, `100` | Limits for photos and videos of your own exercises (see Limits). |
 

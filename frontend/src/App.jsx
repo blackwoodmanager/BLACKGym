@@ -56,6 +56,8 @@ import { BrandMark } from './components/BrandLogo.jsx'
 import TabBar from './components/TabBar.jsx'
 import { startOrPreview, startPickerSheet } from './components/StartSheets.jsx'
 import ScrollTopButton from './components/ScrollTopButton.jsx'
+import FeedbackBug from './components/FeedbackBug.jsx'
+import { canGiveFeedback } from './lib/feedback.js'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import Modals from './components/Modals.jsx'
 import Toast from './components/Toast.jsx'
@@ -456,6 +458,8 @@ function Shell() {
       <SyncBanner />
       {!noTabs && <TabBar onStart={startOrPreview} onPick={startPickerSheet} />}
       {!noTabs && authed && <ScrollTopButton off={loc.pathname === '/workout'} path={loc.pathname} />}
+      {/* BlackGym's bug button: a tab on the screen's edge for the one admin the server wires it to. */}
+      {!noTabs && canGiveFeedback(user) && <FeedbackBug path={loc.pathname} />}
       <RestTimer />
       {/* A circuit's clock, the whole screen (lib/circuit.js): opened from its card in the workout. */}
       <CircuitPlayer />
