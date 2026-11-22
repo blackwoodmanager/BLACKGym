@@ -2993,6 +2993,58 @@ body.resting #totop{bottom:calc(172px + var(--sab))}
 .fb-done{margin:0 0 10px}
 .fb-err{margin:10px 0 0;color:var(--red)}
 .fb-link{color:var(--acc-ink);text-decoration:underline}
+/* The bug sheet's rows and the marked places. */
+#fbbug{overflow:visible}
+.fb-dot{position:absolute;top:3px;inset-inline-start:3px;width:9px;height:9px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 2px var(--surface-raised)}
+.fb-row{display:flex;align-items:center;gap:12px;width:100%;margin-top:8px;padding:12px 14px;border-radius:var(--r-card,14px);background:var(--surface-raised);color:var(--label);border:var(--hair) solid var(--raised-line);font:inherit;text-align:start}
+.fb-row:disabled{opacity:.5}
+.fb-row .icn{font-size:1.25rem;color:var(--acc-ink)}
+.fb-row .chev{color:var(--label-3);font-size:1rem}
+.fb-badge{min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:var(--orange);color:#000;font-size:.8125rem;font-weight:700;display:grid;place-items:center}
+.fb-marks{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.fb-marks li{display:flex;align-items:flex-start;gap:10px;font-size:var(--fs-subhead)}
+.fb-pin,.fbm-pin{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:50%;background:var(--red);color:#fff;font-size:.75rem;font-weight:700;border:2px solid #fff;flex:none}
+.fb-what{color:var(--label-2)}
+.fb-x{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;color:var(--label-2);flex:none}
+.fb-x .icn{font-size:1rem}
+/* The marking layer (components/FeedbackMarkup.jsx). Over the page, under the sheets. */
+.fbm-catch{position:fixed;inset:0;z-index:150;cursor:crosshair;touch-action:none}
+.fbm-box{position:absolute;border:2px dashed var(--red);border-radius:6px;pointer-events:none}
+.fbm-pin{position:absolute;z-index:149;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.fbm-bar{position:fixed;inset-inline:8px;top:calc(8px + var(--sat,0px));z-index:152;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:16px;background:var(--surface-raised);border:var(--hair) solid var(--raised-line);box-shadow:0 10px 30px -10px rgba(0,0,0,.6);max-width:640px;margin-inline:auto}
+.fbm-hint{flex:1;min-width:0;font-size:var(--fs-footnote);color:var(--label-2);line-height:1.25}
+.fbm-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:99px;font:inherit;font-size:var(--fs-footnote);font-weight:600;background:var(--fill,rgba(120,120,128,.24));color:var(--label)}
+.fbm-btn.on{background:var(--acc);color:var(--on-acc)}
+.fbm-btn.go{background:var(--acc);color:var(--on-acc)}
+.fbm-btn .icn{font-size:1rem}
+.fbm-n{min-width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,.25);display:inline-grid;place-items:center;font-size:.6875rem;padding:0 4px}
+.fbm-note{position:fixed;z-index:153;display:grid;gap:8px;padding:12px;border-radius:16px;background:var(--surface-raised);border:var(--hair) solid var(--raised-line);box-shadow:0 16px 40px -12px rgba(0,0,0,.7)}
+.fbm-note-b{display:flex;justify-content:flex-end;gap:8px}
+/* My fixes (views/Fixes.jsx). */
+.fx-sec{margin-top:18px}
+.fx-h{font-size:var(--fs-footnote);text-transform:uppercase;letter-spacing:.04em;color:var(--label-2);font-weight:600;margin:0 4px 8px;display:flex;gap:8px;align-items:center}
+.fx-count{font-weight:700;color:var(--label)}
+.fx-card{background:var(--surface-raised);border:var(--hair) solid var(--raised-line);border-radius:var(--r-card,14px);margin-bottom:10px;overflow:hidden}
+.fx-card.needs{border-color:var(--orange)}
+.fx-head{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;font:inherit;text-align:start;color:var(--label)}
+.fx-kind{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--fill,rgba(120,120,128,.24));color:var(--acc-ink);flex:none}
+.fx-title{display:block;font-weight:600;overflow-wrap:anywhere}
+.fx-sub{display:block;font-size:var(--fs-footnote);color:var(--label-2);margin-top:2px}
+.fx-chip{font-weight:600}
+.fx-chip.st-review,.fx-chip.st-waiting{color:var(--orange)}
+.fx-chip.st-running,.fx-chip.st-shipping{color:var(--blue)}
+.fx-chip.st-closed{color:var(--green)}
+.fx-chip.st-failed,.fx-chip.st-cancelled{color:var(--red)}
+.fx-body{padding:0 14px 14px;display:grid;gap:10px}
+.fx-bar{height:6px;border-radius:3px;background:var(--fill,rgba(120,120,128,.24));overflow:hidden}
+.fx-bar span{display:block;height:100%;background:var(--acc)}
+.fx-sum,.fx-note{margin:0;font-size:var(--fs-subhead)}
+.fx-ask p{margin:0 0 8px}
+.fx-opts{display:flex;flex-wrap:wrap;gap:8px}
+.fx-reply{display:grid;gap:8px;margin-top:8px}
+.fx-links{display:flex;flex-wrap:wrap;gap:6px 14px}
+.fx-foot{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:space-between;font-size:var(--fs-footnote)}
+.fx-cancel{color:var(--red);font:inherit;font-size:var(--fs-footnote);padding:4px 0}
 /* While it shows, the page ends a button's height further up, so the last row's controls scroll
    out from under it rather than sitting beneath it. */
 body.totop-on #app{padding-bottom:calc(144px + var(--sab))}

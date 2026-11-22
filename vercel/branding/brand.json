@@ -7,7 +7,7 @@
     ],
     [
       "GYM",
-      "#DC141C"
+      "#30D158"
     ]
   ],
   "tagline": {
@@ -15,7 +15,7 @@
   },
   "defaults": {
     "theme": "system",
-    "accent": "#DC141C"
+    "accent": "#30D158"
   },
   "default": "kettlebell",
   "icons": [
